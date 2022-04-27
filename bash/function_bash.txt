@@ -1,0 +1,237 @@
+ Bash Function & How to use It{Variables, Arguments, Return}
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Introduction: A bash function is a method used in shell scripts to group reusable code blocks. This feature is available for most programming languages, known under different names such as preocedures, methods, or subroutines.
+
+
+ What Are Bash Functions?
+- - - - - - - - - - - - - -
+ A bash function is a technique for grouping resuable bits of code under one name for later use. The bash function is like a script within a script.
+
+Sysadmin@localhost: ~$ vi testFunction.sh
+
+	#! /bin/bash
+	# Print hello world!
+
+	hello(){
+		echo Hello World!
+	}
+	hello
+
+Using functions in bash scripting comes with two benefits:
+
+1. A function is read directly into the shell's memory and stored for later use. Since computer memory is not issue nowadays, using functions is faster than repeating code.
+2. Functions help organize long shell scripts into modular and reusable code blocks. The chunks are easier to develop and maintain.
+
+ How to Use Bash Functions?
+- - - - - - - - - - - - - - - 
+There are two ways to implement Bash functions:
+
+* Inside a shell script, where the function definition must be before any calls on the function.
+* Alongside other bash alias commands and directly in the terminal as a commands.
+
+To use bash functions, follow the outlines below.
+
+ Bash Function Syntax
+- - - - - - - - - - - - -
+ There are two different ways to declare a bash function:
+
+	<function name> (){
+		<commands>
+	}
+
+Alternatively, the same function can one line:
+
+<function name> (){ <commands>; }
+
+function <function name> (){
+	<commands>
+}
+
+function <function name> { <commands>; }
+
+Take note of the following behaviors and tips when using functions:
+* When writing in one line, the commands must end with a semicolon(;), whether in bash scripts or the terminal directly.
+* Adding the function reserved word makes parentheses optional.
+* The commands between the curly braces { <commands> } are called the function's body. The body can contain any number of declarations, variables, loops, or conditional statements.
+* Try to use descriptive names for functions. Although not necessary when testing functions and commands, descriptive names help in settings where other developers look at the code.
+
+How to Declare and Call a Function?
+- - - - - - - - - - - - - - - - - - -
+ A function does not execute when declared. The function's body executes when invoked after declaration. Follow the steps below to create a bash script with various syntax options:
+
+1. Using your favourite text editor, create a shell script called syntax;
+
+Sysadmin@localhost: ~$ vi syntax.sh
+
+	# syntax.sh
+	# Declaring functions using the reserved word function
+	# Multiline
+	function f1 {
+		echo Hello I\'m function 1
+		echo Bye!
+	}
+	# One line
+	function f2 { echo Hello I\'m function 2; echo Bye!; }
+	# Declaring functions without the function reserved word
+	# Multiline
+	f3 () {
+		echo Hello I\'m function 3
+		echo Bye!
+	}
+	# One line
+	f4 () { echo Hello I\'m function 4; echo Bye!; }
+	# Invoking functions
+	f4
+	f3
+	f2
+	f1
+
+ The script does the following:
+* Lines 4-9 demonstrate how to define a function using the function reserved word. The function f1 uses a multiline syntax in lines 4-6, whereas f2 uses one line syntax on line 9.
+* Lines 13-18 show the more familar syntax. f3  is a multiline function defined in lines 13-16, while f4 on line 18 is the single line equivalent.
+*Lines 21-24 invoke the previously defined functions and execute the commands in the corresponding function's bodies. The calls are made in reversed order from the definition.
+
+
+ How to Declare and Call a Function in the Terminal?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - 
+To declare and use a function in the terminal. Open the terminal and enter the following line:
+
+Sysadmin@localhost: ~$ my_function (){ echo "Hello I'm a function"; echo "Bye!"; }
+Sysadmin@localhost: ~$ my_function
+
+Note: The function only stays defined in the terminal session. To save for future sessions, add the code to the ~/.bashrc file.
+
+Where is a Bash Function Defined?
+- - - - - - - - - - - - - - - - - -
+ To see where a bash function is defined and its contents, enter the following commands in the terminal:
+
+1. Run the bash shell in debugger mode:
+
+Sysadmin@localhost: ~$ bash --debugger
+
+2. Check the function's source file with:
+
+declare -F <function name>
+
+for example:
+Sysadmin@localhost: ~$ declare -F my_function
+
+Note: The output prints the function's name, the line number, and the file location where the function definition is.
+
+3. To see the function's contents, run:
+
+declare -f <function_name>
+
+Sysadmin@localhost: ~$ declare -f my_function
+
+Note: The declare built-in in debugging mode allows viewing the function's contents and location without running the code.
+
+ How to Delete a Bash Function?
+- - - - - - - - - - - - - - - - - 
+ If you need to free up a namespace occupied by a function in the current terminal session, run:
+
+unset <function name>
+
+Sysadmin@localhost: ~$ unset my_function
+
+Note: The function is nolonger available in the current terminal session. However, if the code is in the ~/.bashrc file, everything is restored to normal in the next session.
+
+ Bash Function Variables
+- - - - - - - - - - - - - -
+ The variables in bash are global by default and accessible from anywhere, including function bodies. Variables defined inside a function are also global. Adding the keyword local makes the term accessible only within the function and the child functions/processes.
+
+In dynamic scoping, local variable shadows a global variable when the two carry the same name.
+
+Sysadmin@localhost: ~$ vi variable.sh
+
+	#! /bin/bash
+	var1=1
+	var2=1
+	change() {
+		echo Inside function
+		echo Variable 1 is: $var1
+		echo Variable 2 is: $var2
+		local var1=5
+		var2=5
+		echo
+		echo After change inside function
+		echo Variable 1 is locally $var1
+		echo Variable 2 is globally $var2
+	}
+
+	echo Before function invocation
+	echo Variable 1 is: $var1
+	echo Variable 2 is: $var2
+	echo
+	change
+	echo
+	echo After function invocation
+	echo Variable 1 is: $var1
+	echo Variable 2 is: $var2
+
+The script above show the following:
+* Lines 1-2 declare variables var1 and var2 and set them both into 1.
+* Lines 5-6 are inside the function's body and print the variables to the console. Since the variable scope is global, the original values print out.
+* Line 7 declares a new local variable with the same name as the global variable var1. The local var1 shadows the global var1 value due to dynamic scoping.
+* Line 8 changes the value of the global var2 variable.
+* Line 14-22 print the variable values before and after calling the function.
+
+ Bash Function Arguments
+- - - - - - - - - - - - - -
+ To pass arguments to a function, add the parameters after the function call separated by spaces. The table below outlines the available options when working with bash function arguments.
+
+	Argument	|	Role
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	$0		|   Reserves the function's name when defined in the 			|   terminal.When defined in a bash script, $0 returns the 			|   script's name and location.
+	$1, $2...$n etc |   Corresponds to the argument's position after the 			|   function name.
+	$#		|   Holds the count of positional arguments passed to the 			|   function.
+	$@ and $*	|   Hold the positional arguments list and function the 			|   same when used this way.
+	"$@"		|   Expands the list to separate strings. For example 			|   "$1","$2",etc.
+	"$*"		|   Expands the list into a single string, separating 			|   parameters with a space. For example "$1 $2" etc.
+			| 
+			|
+
+Sysadmin@localhost: ~$ vi arguments.sh
+
+	#! /bin/bash
+	arguments () {
+		echo The function location is $0
+		echo There are $# arguments
+		echo "Argument 1 is $1"
+		echo "Argument 2 is $2"
+		echo "<$@>" and "<$*>" are the same.
+		echo List the elements in a for loop to see the difference!
+		echo "* gives:"
+		for arg in "$*"; do echo "<$arg>"; done
+		echo "@ gives:"
+		for arg in "$@"; do echo "<$arg>"; done
+	}
+
+	arguments hello world
+
+The output displays descriptive messages for each argument used.
+
+ Bash Function Return
+- - - - - - - - - - - - -
+ Bash functions differ from most programming languages when it comes to returning a value from a function. By default. bash returns the exit status of the last executed command in the function's body.
+
+Sysadmin@localhost: ~$ vi returnClause.sh
+
+	#! /bin/bash
+	test_function() {
+		echo Test
+		return 100
+	}
+	echo The function\'s output is:
+	test_function
+	echo The exit status is:
+	echo $?
+
+An alternative method is to echo the function's result and assign the output to a variable. Edit returnClause.sh
+
+	#! /bin/bash
+	test_function() {
+		echo Test
+	}
+	result=$(test_function)
+	echo $result is saved in a variable for later use

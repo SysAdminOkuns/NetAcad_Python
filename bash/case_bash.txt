@@ -1,0 +1,190 @@
+ Introduction
+- - - - - - - - 
+  The bash case statement is the simplest form of the if elif else conditonal statement. The case statement simplifies complex conditions with multiple different choices. This statement is easier to maintain and more readable than nested if statements.
+
+   The case statement tests the input value until it finds the corresponding pattern and executes the command linked to that input value. Thus, it is an excellent choice for creating menus where users select an option which triggers a corresponding action.
+
+ Bash case Statement syntax
+- - - - - - - - - - - - - - -
+   The bash case statement takes the following syntax:
+
+	case $variable in
+	pattern-1)
+		commands;;
+	pattern-2)
+		commands;;
+	pattern-3)
+		commands;;
+	pattern-N)
+		commands;;
+	*)
+		commands;;
+	esac
+
+  The case statement starts with the case keyword followed by the $variable and the in keyword. The statement ends with the case keyword spelled backward esac.
+
+* $variable, the script compares the input $variable against the patterns in each clause until it finds a match.
+
+ Patterns
+- - - - - -
+* A pattern and it's commands make a clause, which ends with ;;
+* Patterns support special characters.
+* The ) operator terminates a pattern list.
+* The | or pipe operator separate multiple patterns.
+* The script executes the commands corresponding to the first pattern matching the input $variable.
+* The asterisk * symbol defines the default case, usually in the final pattern.
+
+ Exit Status
+- - - - - - - -
+The script has two exit statuses:
+
+* 0. The return status when the input matches no pattern.
+* Executed  command status. if the command matches the input variable to a pattern, the executed command exit status is returned.
+
+Sysadmin@localhost: ~$ vi color.sh
+
+	#!/bin/bash
+	echo "Which color do you like best?"
+	echo "1 - Blue"
+	echo "2 - Red"
+	echo "3 - Yellow"
+	echo "4 - Green"
+	echo "5 - Orange"
+	read color;
+	case $color in
+		1) echo "Blue is a primary color.";;
+		2) echo "Red is a primary color.";;
+		3) echo "Yellow is a primary color.";;
+		4) echo "Green is a secondary color.";;
+		5) echo "Orange is a secondary color.";;
+		*) echo "This color is not available. \
+		Please choose a different one.";;
+	esac
+
+Each of the line has the following role:
+* The first line in each script is typically the crunchbang(#!), which instructs the operating system which interpreter to use to parse the file.
+* Lines 2 - 7 are the options menu presented to the user to choose from.
+* The read color; variable prompts the user for an answer and stores it within color.
+* The case statement contains the possible responses that correspond to the user's input. In this example, the output is the echo command output.
+* The last line, esac, ends the case statement.
+
+
+ Using Multiple Patterns
+- - - - - - - - - - - - - -
+   The case statement allows using multiple patterns in each clause. if the expression matches the specified patterns, the script executes the commands in that clause.
+This example script prompts the user to enter a month and outputs the number of days. There are three possible answers:
+
+* 30 days
+* 31 days
+* 28 or 29 days for february.
+
+Sysadmin@localhost: ~$ vi month.sh
+
+	#!/bin/bash
+	shopt -s nocasematch
+	echo "Enter the name of a month."
+	read month
+	case $month in
+	February) echo "There are 28/29 days in $month.";;
+	April | June | September | November) echo "There are 30 days in $month.";;
+	January | March | May | July | August | October | December)
+	echo "There are 31 days in $month.";;
+	*) echo "Unknown month. Please check if you entered the correct \
+	month name: $month";;
+	esac
+
+* The shopt command with the -s nocasematch option reduces the chance for error with the pattern matching case insensitive.
+* The pipe symbol | separates the patterns in each of the clauses.
+
+Note: shopt is a built-in command in Unix-like operating systems, such as macOS and Linux distributions. The "shopt" command provides control over many settings that are used to tweak the operations in a Bash shell.
+
+ Options	|	Description
+ -------------------------------------- -----------
+ -s		|	set[optname...]
+ -u		|	unset[optname...]
+ -p		| 	Show list of all settable[optname...]
+ -q		|	Indicate status of [optname...]
+ -o		|	Restrict values of [optname...] to be those defined for the			|	"-o" to be built-in
+		|									
+
+Sysadmin@localhost: ~$ shopt | column
+Sysadmin@localhost: ~$ shopt -s
+Sysadmin@localhost: ~$ shopt -s histappend
+Sysadmin@localhost: ~$ shopt -u | column
+Sysadmin@localhost: ~$ shopt -u
+Sysadmin@localhost: ~$ shopt -s | column
+Sysadmin@localhost: ~$ shopt histverify
+Sysadmin@localhost: ~$ shopt -s cdspell
+Sysadmin@localhost: ~$ shopt -s xpg_echo
+Sysadmin@localhost: ~$ nano .bashrc ## How to make changes permanent
+
+ for loops
+- - - - - - -
+Sysadmin@localhost: ~$ vi filelist.sh
+
+	#!/bin/bash
+	for file in $(ls)
+	do
+		Extension=${file##*.}
+		case "$Extension" in
+			sh) echo "Shell script: $file";;
+			md) echo "A markdown file: $file";;
+			png) echo "PNG image file: $file";;
+			txt) echo "A text file: $file";;
+			zip) echo "An archive: $file";;
+			conf) echo "A configuration file: $file";;
+			py) echo "A Python script: $file";;
+			*) echo "Unknown file type: $file";;
+		esac
+	done
+
+ Create an Address Book
+- - - - - - - - - - - - -
+   Use the case statement to create a simple database and swiftly generate the requested information. The following example outputs the name, email address, and the selected person's address:
+
+Sysadmin@localhost: ~$ vi phonebook.sh
+
+	#!/bin/bash
+	echo "Choose a contact to display information:"
+	echo "[C]hris Ramsey"
+	echo "[J]ames Gardner"
+	echo "[S]arah Snyder"
+	echo "[R]ose Armstrong"
+	read person
+	case "$person" in
+		"C" | "c" ) echo "Chris Ramsey"
+			echo "cramsey@email.com"
+			echo "27 Railroad Dr. Bayside, NY";;
+		"J" | "j" ) echo "James Gardner"
+			echo "jgardner@email.com"
+			echo "31 Green Street, Green Cove Springs, FL";;
+		"S" | "s") echo "Sarah Snyder"
+			echo "ssnyder@email.com"
+			echo "8059 N. Hartford Court, Syosset, NY";;
+		"R" | "r") echo "Rose Armstrong"
+			echo "rarmstrong@email.com"
+			echo "49 Woodside St., Oak Forest, IL";;
+		*) echo "Contact doesn't exist.";;
+	esac
+
+  Check Character Type
+- - - - - - - - - - - - -
+
+Sysadmin@localhost: ~$ vi character.sh
+
+	#!/bin/bash
+	echo "Enter a character:"
+	read var
+	case $var in
+		[[:lower:]) echo "You entered a lowercase character.";;
+		[[:upper:]]) echo "You entered an uppercase character.";;
+		[0-9]) echo "You entered a digit.";;
+		?) echo "You entered a special character.";;
+		*) echo "You entered multiple characters.";;
+	esac
+
+* The $var control variable stores the input.
+* Instead of typeing all possible combinations to match against, use the square brackets [] to denote a character range. Use double square brackets [[]] for POSIX ranges. if-elase requires entering each character condition individually.
+* The ? character covers characters that aren't lowercase, uppercase, or digits. It substitutes only one character, as opposed to * which replaces everything else not covered by the conditions above.
+
+Note: Although it is possoble to use [a-z] to denote a lowercase character range, uppercase characters are trapped as well on some Linux distributions.

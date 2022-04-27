@@ -1,0 +1,285 @@
+IT Essentials : https://www.netacad.com/portal/self-enroll/m/138037
+Bash: if-elif-else.
+- - - - - - - - - - -
+   Bash scripts help in the automation of task in your machine. The if-elif-else statement in bash scripts allows creating conditional cases and responses to specific code results. The if conditional helps automate a decision-making process during a program.
+   The if-statement in programming is a conditional expression. However, the expression tested in the if-statement evaluates based on the exit status(either 0 for successful or 1 for failure).
+* If the command completes successfully, the exit status is 0.
+* If the statement throws an error, the exit status is any number between 1 and 255.
+
+   The zero for success and any non-zero value for failure seems counterintuitive. In most other programming languages, zero represents false, and one(or greater) represents true. However, in bash scripting, the Unix convention returns the exit status instead of a truth value, and the two should not be confused.
+
+  For instances:
+Sysadmin@localhost: ~$ test 1 -gt 100
+Sysadmin@localhost: ~$ echo $? // 1
+
+Note: The test returns an exit status code of 1, indicating the expression failed.
+
+Sysadmin@localhost: ~$ test 1000 -gt 100
+Sysadmin@localhost: ~$ echo $? // 0
+
+Note: The test returns an exit status code of 0, indicating the expression succeeded.
+
+ Demo
+- - - -
+#! /bin/bash
+
+echo -n "Please enter a whole number: "
+read VAR
+echo Your number is $VAR
+
+if test $VAR -gt 100;
+then
+	echo "$VAR greater than 100"
+fi
+
+echo Bye!
+
+* The if-keyword starts the statement and checks the exit status code for command right after test($VAR -gt 100).
+* Signals the start of commands to execute only if the statement in the if-statement completes successfully(that is with an exit status of 0), meaning we entered a number greater than 100.
+* fi signals the end of the if-statement.
+
+Note: The script above outputs different message based on the entered number. Run the script multiple times and test for other numbers to confirm the behaviour of the script.
+// Test Data: 80,90,101,200...
+
+  Bash if Statement Syntax
+ - - - - - - - - - - - - - -
+  The basic syntax for a bash if-statement is:
+
+if <commands>
+then
+<commands>
+fi
+
+Each keyword has a specific function;
+* if signals the statement's beginning. The command right after is the one in which the exit status check applies
+* then executes the commands only if the previous review completes successfully.
+* fi closes the if statement.
+
+  Enclosing the test command in different brackets results in different execution methods for the if statement. The table below provides a short descritption as well as a use case for each bracket type.
+
+ Syntax		|	What it is	|	When to use
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+if(<command>)	| Subshell executed in	| When the commands affect the current
+		| a subprocess.		| shell or environment. The changes do not
+		|			| remain when the subshell completes.
+if((<command>))	| Bash extension.	| Use for arithmetic operations and  
+		|			| C-style variable manipulation.
+if[<command>]	| POSIX builtin, alias	| Comparing numbers and testing whether                                                          	        | for test <commands>	| a file exists.
+if[[<command>]] | Bash extension, an 	| String matching a wildcard pattern.
+		| advanced version of	|												
+		| version of single	|												
+		| square brackets.	|												
+
+Below are example bash scripts that use each bracket type with a more in-depth explanation.
+
+ Single-Parentheses Syntax
+- - - - - - - - - - - - - - - 
+  Using single parentheses in bash scripting creates a subshell. when combined with the if-statement, the subprocess finishes before continuing the program. The if analyzes the exit status and acts accordingly.
+			   --------------------------------------------------	
+The bash if statement with single parentheses syntax looks like following:
+
+	if ( <commands> )
+	then
+		<commands>
+	fi
+
+Sysadmin@localhost: ~$ vi single_parentheses.sh
+
+Add the following code snippett:
+
+	outer_variable=Defined
+	echo Before if:
+	echo inner_variable = $inner_variable
+	echo outer_variable = $outer_variable
+
+	if (
+		echo Inside subshell:
+		inner_variable=Defined
+		echo inner_variable = $inner_variable
+		outer_variable=Changed
+		echo outer_variable = $outer_variable
+	)
+	then
+		echo After then:
+		echo inner_variable = $iner_variable
+		echo outer_variable = $outer_variable
+	fi
+	echo After fi:
+	echo inner_variable = $inner_variable
+	echo outer_variable = $outer_variable
+
+
+* Line 1 creates a variable called outer_variable in which we store a string Defined.
+* Line 2 - 4 print the variables to the console. At this moment, outer_variable has a string stored in it, while inner_variable is blank.
+* Line 5 starts the if statement and a sub-process, delimited by single parentheses.
+* Line 6 - 11 Store a string inside the inner_variable and change the outer_variable to a different string. Both values print to the console, and the sub-process ends with an exit code. In this case, the sub-process ends with an exit code 0.
+* Line 12 - 16 execute after the sub-process and print the variable values. However, the values change back to what they were before the if statement. The sub-process only stores the values locally and not globally.
+* Lines 16 - 19 run after the commands in the then clause. The values remain unchanged outside the statement.
+
+ Double-Parentheses Syntax
+- - - - - - - - - - - - - - -
+  The double-parentheses syntax for a bash if statement is:
+
+	if (( <commands> ))
+	then
+		<commands>
+	fi
+
+The double parentheses construct in bash allows:
+
+* Arithmetic evaluation. Defining a variable as a=$(( 1+1 )) calculates the equation and sets a to 2.
+* C-style variable manipulation. For example, incrementing variables with (( a++ )).
+
+When using double-parentheses syntax in an if-statement, the evaluation behaves differently. Suppose the expression evaluates to 0, then the if test does not pass.
+
+Note: Double parantheses are analogous to most programming languages, where zero is false and one is true.
+
+Sysadmin@localhost: ~$ vi double_parenthese.sh
+
+	variable=-2
+	echo Before first if: $variable
+	if (( variable++ ))
+	then
+		echo Incremented ++ style: $variable
+	fi
+	echo After first if: $variable
+	if (( variable=variable+1 ))
+	then
+		echo Incremented arithmetically $variable
+	fi
+	echo After second if: $variable
+
+Each line number in the script above does the following:
+* Line 1 defines variable and sets the value to -2.
+* Lines 3 - 5 increments the value C-style inside double parentheses and check the value. if the variable is not zero, the if prints a message to the console.
+* Lines 8 - 10 increments the variable by one using regular arithmetic notation and prints a message if the variable is not zero.
+
+
+ Single-Bracket Syntax
+- - - - - - - - - - - - -
+  The single bracket is another name for the test command and a standard POSIX utility available for all shells. The basic sybtax is:
+
+	if [ <commands> ]
+	then
+		<commands>
+	fi
+
+Sysadmin@localhost: ~$ vi test_script.sh
+
+	echo -n "Please enter a whole number: "
+	read VAR
+	echo Your number is $VAR
+	if [ $VAR -gt 100 ]
+	then
+		echo "It's greater than 100"
+	fi
+	echo Bye!
+
+Note: For complete documentation and details on using bracket syntax, run the man command on the test utility:
+
+Sysadmin@localhost: ~$ man test
+
+
+ Double-Bracket Syntax
+- - - - - - - - - - - - -
+   The double-bracket syntax in bash if scripts is the best option if portability is not necessary. The double-brackets are superior to single to single-brackets and include many advanced options. The syntax is:
+
+	if [[ <commands> ]]
+	then
+		<commands>
+	fi
+
+Sysadmin@localhost: ~$ vi double_brackets.sh
+
+	if [[ $USER == S* ]];
+	then
+		echo Hello $USER!
+	fi
+	echo Bye!
+
+
+ Other Types of Bash Conditional Statements
+- - - - - - - - - - - - - - - - - - - - - - - 
+   The if else statement provides one method to define different actions based on the output of the checked conditional. The basic syntax is:
+
+	if <command>
+	then
+		<commands>
+	else
+		<commands>
+	fi
+
+The following example demonstrates how the if else conditional works:
+
+Sysadmin@loaclhost: ~$ vi if_else.sh
+
+
+	echo -n "Please enter a whole number: "
+	read VAR
+	echo Your number is $VAR
+	if [ $VAR -gt 100 ]
+	then
+		echo "It's greater than 100"
+	else
+		echo "It's less than 100"
+	fi
+	echo Bye!
+
+* The statement checks the command output line in line 4 and prints a descriptive message based on the result.
+* if the entered number is greater than 100, the program enters line 6 and prints the message.
+* if the number is less than 100, the message in the else clause (line 8) prints to the console.
+
+
+ if elif Statement
+- - - - - - - - - - -
+   The elif clause combined with the if else statement creates multiple conditional checks. The if elif creates a series of checksmwith different results. The syntax is:
+
+
+	if <command>
+	then
+		<commands>
+	elif <command>
+	then
+		<commands>
+	else
+		<commands>
+	fi
+
+
+Sysadmin@localhost: ~$ vi elif.sh
+
+	echo -n "Please enter a whole number: "
+	read VAR
+	echo Your number is $VAR
+	if [ $VAR -gt 100 ]
+	then
+		echo "It's greater than 100"
+	elif [ $VAR -lt 100 ]
+	then
+		echo "It's less than 100"
+	else
+		echo "It's exactly 100"
+	fi
+	echo Bye!
+
+* The script above adds an elif check on line 7 to see if the entered number is less than 100. if the statements in lines 4 and 7 both fail, the program jumps to the else clause.
+
+ Nested if Statement
+- - - - - - - - - - - -
+Nested if statements add a branch inside the if. Specifically, when a command passes the first if check, it goes throug a new check to filter the result further. The syntax:
+
+	if <commands>
+	then
+		if <commands>
+		then
+			<commands>
+		fi
+	fi
+
+The nested if is commonly used to search through multi-dimensional arrays. However, try to avoid having more two or three nested if statements to reduce program complexity. Rethink the code's logic when the nested if keeps growing in depth.
+
+
+
+
+
+
